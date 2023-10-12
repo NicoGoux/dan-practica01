@@ -1,6 +1,5 @@
 package isi.dan.practicas.practica1.service_impl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,9 +15,13 @@ import isi.dan.practicas.practica1.model.Docente;
 import isi.dan.practicas.practica1.service.AlumnoService;
 import isi.dan.practicas.practica1.service.CursoService;
 import isi.dan.practicas.practica1.service.DocenteService;
+import isi.dan.practicas.practica1.service.MemoryDB;
 
 @Service
 public class CursoServiceImpl implements CursoService {
+
+	@Autowired
+	private MemoryDB memoryDB;
 
 	@Autowired
 	AlumnoService alumnoService;
@@ -26,24 +29,20 @@ public class CursoServiceImpl implements CursoService {
 	@Autowired
 	DocenteService docenteService;
 
-	private static Integer ID = 1;
-	private static List<Curso> listaCursos = new ArrayList<>();
-
 	@Override
 	public Curso guardarCurso(Curso c) throws RecursoNoEncontradoException {
 		if (c.getId() == null) {
-			c.setId(ID);
-			ID++;
-			listaCursos.add(c);
+			c.setId(memoryDB.siguienteIdCurso());
+			memoryDB.getListaCursos().add(c);
 		}
 		else {
 			Integer idCurso = c.getId();
-			Optional<Curso> cursoEncontrado = listaCursos.stream()
+			Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
 					.filter(curso -> curso.getId() == idCurso)
 					.findFirst();
 			if (cursoEncontrado.isPresent()) {
-				int indexOf = listaCursos.indexOf(cursoEncontrado.get());
-				listaCursos.add(indexOf, c);
+				int indexOf = memoryDB.getListaCursos().indexOf(cursoEncontrado.get());
+				memoryDB.getListaCursos().add(indexOf, c);
 			}
 			else {
 				throw new RecursoNoEncontradoException("Curso", idCurso);
@@ -54,7 +53,7 @@ public class CursoServiceImpl implements CursoService {
 
 	@Override
 	public Optional<Curso> buscarCursoPorId(Integer id) throws RecursoNoEncontradoException {
-		Optional<Curso> cursoEncontrado = listaCursos.stream()
+		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
 				.filter(curso -> curso.getId() == id)
 				.findFirst();
 		if (cursoEncontrado.isPresent()) {
@@ -67,17 +66,17 @@ public class CursoServiceImpl implements CursoService {
 
 	@Override
 	public List<Curso> listarCursos() {
-		return listaCursos;
+		return memoryDB.getListaCursos();
 	}
 
 	@Override
 	public void bajaCurso(Integer id) throws RecursoNoEncontradoException {
-		Optional<Curso> cursoEncontrado = listaCursos.stream()
+		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
 				.filter(curso -> curso.getId() == id)
 				.findFirst();
 		if (cursoEncontrado.isPresent()) {
-			int indexOf = listaCursos.indexOf(cursoEncontrado.get());
-			listaCursos.remove(indexOf);
+			int indexOf = memoryDB.getListaCursos().indexOf(cursoEncontrado.get());
+			memoryDB.getListaCursos().remove(indexOf);
 		}
 		else {
 			throw new RecursoNoEncontradoException("Curso", id);
@@ -87,7 +86,7 @@ public class CursoServiceImpl implements CursoService {
 	@Override
 	public void asignarDocente(Integer idCurso, Integer idDocente)
 			throws RecursoNoEncontradoException, DocenteExcedidoException {
-		Optional<Curso> cursoEncontrado = listaCursos.stream()
+		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
 				.filter(curso -> curso.getId() == idCurso)
 				.findFirst();
 		if (cursoEncontrado.isPresent()) {
@@ -104,7 +103,7 @@ public class CursoServiceImpl implements CursoService {
 	@Override
 	public void inscribirAlumno(Integer idCurso, Integer idAlumno)
 			throws RecursoNoEncontradoException, CupoExcedidoException {
-		Optional<Curso> cursoEncontrado = listaCursos.stream()
+		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
 				.filter(curso -> curso.getId() == idCurso)
 				.findFirst();
 		if (cursoEncontrado.isPresent()) {
