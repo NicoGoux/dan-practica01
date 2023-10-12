@@ -12,7 +12,7 @@ public class Curso {
 	private Integer creditos;
 	private Integer cupo;
 	private Docente docenteAsignado;
-	private List<Alumno> listaInscriptos;
+	private List<Integer> listaInscriptos;
 
 	/**
 	 * @param id
@@ -22,8 +22,7 @@ public class Curso {
 	 * @param docenteAsignado
 	 * @param listaInscriptos
 	 */
-	public Curso(Integer id, String nombre, Integer creditos, Integer cupo, Docente docenteAsignado,
-			List<Alumno> listaInscriptos) {
+	public Curso(Integer id, String nombre, Integer creditos, Integer cupo, Docente docenteAsignado) {
 		this.id = id;
 		this.nombre = nombre;
 		this.creditos = creditos;
@@ -110,7 +109,7 @@ public class Curso {
 	/**
 	 * @return the listaInscriptos
 	 */
-	public List<Alumno> getListaInscriptos() {
+	public List<Integer> getListaInscriptos() {
 		return listaInscriptos;
 	}
 
@@ -118,12 +117,12 @@ public class Curso {
 	 * @param listaInscriptos
 	 *            the listaInscriptos to set
 	 */
-	public void setListaInscriptos(List<Alumno> listaInscriptos) {
+	public void setListaInscriptos(List<Integer> listaInscriptos) {
 		this.listaInscriptos = listaInscriptos;
 	}
 
 	public void asignarDocente(Docente docente) throws DocenteExcedidoException {
-		if (!docente.getCursosDictados().contains(this)) {
+		if (!docente.getCursosDictados().contains(this.getId())) {
 			if (docente.obtenerCantidadCursosDictados() < 3) {
 				this.removerDocente();
 				this.setDocenteAsignado(docente);
@@ -136,10 +135,10 @@ public class Curso {
 	}
 
 	public void inscribirACurso(Alumno alumno) throws CupoExcedidoException {
-		if (!this.listaInscriptos.contains(alumno)) {
+		if (!this.listaInscriptos.contains(alumno.getId())) {
 			if (this.listaInscriptos.size() < this.cupo) {
 				alumno.addCursoInscripto(this);
-				this.listaInscriptos.add(alumno);
+				this.listaInscriptos.add(alumno.getId());
 			}
 			else {
 				throw new CupoExcedidoException();

@@ -7,7 +7,7 @@ public class Alumno {
     private Integer id;
     private String nombre;
     private Integer legajo;
-    List<Curso> cursosInscriptos;
+    List<Integer> cursosInscriptos;
 
     /**
      * @param id
@@ -70,7 +70,7 @@ public class Alumno {
     /**
      * @return the cursosInscriptos
      */
-    public List<Curso> getCursosInscriptos() {
+    public List<Integer> getCursosInscriptos() {
         return cursosInscriptos;
     }
 
@@ -78,12 +78,12 @@ public class Alumno {
      * @param cursosInscriptos
      *            the cursosInscriptos to set
      */
-    public void setCursosInscriptos(List<Curso> cursosInscriptos) {
+    public void setCursosInscriptos(List<Integer> cursosInscriptos) {
         this.cursosInscriptos = cursosInscriptos;
     }
 
     public void addCursoInscripto(Curso curso) {
-        this.cursosInscriptos.add(curso);
+        this.cursosInscriptos.add(curso.getId());
     }
 
     @Override

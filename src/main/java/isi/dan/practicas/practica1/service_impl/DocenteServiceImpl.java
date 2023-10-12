@@ -15,7 +15,7 @@ import isi.dan.practicas.practica1.service.MemoryDB;
 public class DocenteServiceImpl implements DocenteService {
 
 	@Autowired
-	private static MemoryDB memoryDB;
+	private MemoryDB memoryDB;
 
 	@Override
 	public Docente guardarDocente(Docente d) throws RecursoNoEncontradoException {

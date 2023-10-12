@@ -7,7 +7,7 @@ public class Docente {
 	private Integer id;
 	private String nombre;
 	private Double salario;
-	private List<Curso> cursosDictados;
+	private List<Integer> cursosDictados;
 
 	/**
 	 * @param id
@@ -70,7 +70,7 @@ public class Docente {
 	/**
 	 * @return the cursosDictados
 	 */
-	public List<Curso> getCursosDictados() {
+	public List<Integer> getCursosDictados() {
 		return cursosDictados;
 	}
 
@@ -78,7 +78,7 @@ public class Docente {
 	 * @param cursosDictados
 	 *            the cursosDictados to set
 	 */
-	public void setCursosDictados(List<Curso> cursosDictados) {
+	public void setCursosDictados(List<Integer> cursosDictados) {
 		this.cursosDictados = cursosDictados;
 	}
 
@@ -91,11 +91,11 @@ public class Docente {
 	}
 
 	public void removeCurso(Curso curso) {
-		this.cursosDictados.remove(this.cursosDictados.indexOf(curso));
+		this.cursosDictados.remove(this.cursosDictados.indexOf(curso.getId()));
 	}
 
 	public void addCursoDictado(Curso curso) {
-		this.cursosDictados.add(curso);
+		this.cursosDictados.add(curso.getId());
 	}
 
 	@Override
