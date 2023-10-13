@@ -22,13 +22,14 @@ public class Curso {
 	 * @param docenteAsignado
 	 * @param listaInscriptos
 	 */
-	public Curso(Integer id, String nombre, Integer creditos, Integer cupo, Docente docenteAsignado) {
+	public Curso(Integer id, String nombre, Integer creditos, Integer cupo, Docente docenteAsignado,
+			List<Integer> listaInscriptos) {
 		this.id = id;
 		this.nombre = nombre;
 		this.creditos = creditos;
 		this.cupo = cupo;
-		this.docenteAsignado = null;
-		this.listaInscriptos = new ArrayList<>(0);
+		this.docenteAsignado = docenteAsignado;
+		this.listaInscriptos = listaInscriptos;
 	}
 
 	/**
@@ -151,5 +152,11 @@ public class Curso {
 			this.docenteAsignado.removeCurso(this);
 			this.setDocenteAsignado(null);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "Curso [id=" + id + ", nombre=" + nombre + ", creditos=" + creditos + ", cupo=" + cupo
+				+ ", docenteAsignado=" + docenteAsignado + ", listaInscriptos=" + listaInscriptos + "]";
 	}
 }

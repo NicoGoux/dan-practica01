@@ -1,7 +1,6 @@
 package isi.dan.practicas.practica1.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ public class alumnoController {
 	}
 
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Optional<Alumno>> obtenerAlumno(@PathVariable Integer id) {
+	public ResponseEntity<Alumno> obtenerAlumno(@PathVariable Integer id) {
 		try {
 			return ResponseEntity.ok(this.alumnoService.buscarAlumnoPorId(id));
 		}
