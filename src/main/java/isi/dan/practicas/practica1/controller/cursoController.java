@@ -1,8 +1,5 @@
 package isi.dan.practicas.practica1.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,14 +24,13 @@ public class cursoController {
 	CursoService cursoService;
 
 	@GetMapping()
-	public ResponseEntity<List<Curso>> listarCursos() {
+	public ResponseEntity<?> listarCursos() {
 		try {
 			return ResponseEntity.ok(this.cursoService.listarCursos());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@GetMapping(path = "/{idCurso}/inscribir-alumno/{idAlumno}")
@@ -47,6 +43,18 @@ public class cursoController {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
 		return ResponseEntity.ok("Alumno asignado");
+	}
+
+	@GetMapping(path = "/{idCurso}/desinscribir-alumno/{idAlumno}")
+	public ResponseEntity<String> desinscribirAlumno(@PathVariable Integer idCurso,
+			@PathVariable Integer idAlumno) {
+		try {
+			this.cursoService.desinscribirAlumno(idCurso, idAlumno);
+		}
+		catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+		}
+		return ResponseEntity.ok("Alumno desasignado");
 	}
 
 	@GetMapping(path = "/{idCurso}/asignar-docente/{idDocente}")
@@ -62,14 +70,13 @@ public class cursoController {
 	}
 
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Optional<Curso>> obtenerCurso(@PathVariable Integer id) {
+	public ResponseEntity<?> obtenerCurso(@PathVariable Integer id) {
 		try {
 			return ResponseEntity.ok(this.cursoService.buscarCursoPorId(id));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@PostMapping

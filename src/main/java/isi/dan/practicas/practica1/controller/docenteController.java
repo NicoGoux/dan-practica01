@@ -1,8 +1,5 @@
 package isi.dan.practicas.practica1.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,25 +23,23 @@ public class docenteController {
 	DocenteService docenteService;
 
 	@GetMapping()
-	public ResponseEntity<List<Docente>> listarDocentes() {
+	public ResponseEntity<?> listarDocentes() {
 		try {
 			return ResponseEntity.ok(this.docenteService.listarDocentes());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Optional<Docente>> obtenerDocente(Integer id) {
+	public ResponseEntity<?> obtenerDocente(Integer id) {
 		try {
 			return ResponseEntity.ok(this.docenteService.buscarDocentePorId(id));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@PostMapping

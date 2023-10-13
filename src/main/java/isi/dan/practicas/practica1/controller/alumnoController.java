@@ -1,8 +1,5 @@
 package isi.dan.practicas.practica1.controller;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,25 +23,23 @@ public class alumnoController {
 	AlumnoService alumnoService;
 
 	@GetMapping()
-	public ResponseEntity<List<Alumno>> listarAlumnos() {
+	public ResponseEntity<?> listarAlumnos() {
 		try {
 			return ResponseEntity.ok(this.alumnoService.listarAlumnos());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Optional<Alumno>> obtenerAlumno(@PathVariable Integer id) {
+	public ResponseEntity<?> obtenerAlumno(@PathVariable Integer id) {
 		try {
 			return ResponseEntity.ok(this.alumnoService.buscarAlumnoPorId(id));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@PostMapping

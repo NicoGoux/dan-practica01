@@ -8,68 +8,40 @@ import org.springframework.stereotype.Service;
 
 import isi.dan.practicas.practica1.exception.RecursoNoEncontradoException;
 import isi.dan.practicas.practica1.model.Docente;
+import isi.dan.practicas.practica1.repositories.DocenteRepository;
 import isi.dan.practicas.practica1.service.DocenteService;
-import isi.dan.practicas.practica1.service.MemoryDB;
 
 @Service
 public class DocenteServiceImpl implements DocenteService {
 
 	@Autowired
-	private MemoryDB memoryDB;
+	DocenteRepository docenteRepo;
 
 	@Override
 	public Docente guardarDocente(Docente d) throws RecursoNoEncontradoException {
-		if (d.getId() == null) {
-			d.setId(memoryDB.siguienteIdDocente());
-			memoryDB.getListaDocentes().add(d);
+		Docente docente = docenteRepo.save(d);
+		if (docente == null) {
+			throw new RecursoNoEncontradoException("Docente", d.getId());
 		}
-		else {
-			Integer idDocente = d.getId();
-			Optional<Docente> docenteEncontrado = memoryDB.getListaDocentes().stream()
-					.filter(docente -> docente.getId() == idDocente)
-					.findFirst();
-			if (docenteEncontrado.isPresent()) {
-				int indexOf = memoryDB.getListaDocentes().indexOf(docenteEncontrado.get());
-				memoryDB.getListaDocentes().add(indexOf, d);
-			}
-			else {
-				throw new RecursoNoEncontradoException("Docente", idDocente);
-			}
-		}
-
-		return d;
+		return docente;
 	}
 
 	@Override
-	public Optional<Docente> buscarDocentePorId(Integer id) throws RecursoNoEncontradoException {
-		Optional<Docente> docenteEncontrado = memoryDB.getListaDocentes().stream()
-				.filter(docente -> docente.getId() == id)
-				.findFirst();
-		if (docenteEncontrado.isPresent()) {
-			return docenteEncontrado;
-		}
-		else {
+	public Docente buscarDocentePorId(Integer id) throws RecursoNoEncontradoException {
+		Optional<Docente> docente = docenteRepo.findById(id);
+		if (!docente.isPresent()) {
 			throw new RecursoNoEncontradoException("Docente", id);
 		}
+		return docente.get();
 	}
 
 	@Override
 	public List<Docente> listarDocentes() {
-		return memoryDB.getListaDocentes();
+		return docenteRepo.findAll();
 	}
 
 	@Override
 	public void bajaDocente(Integer id) throws RecursoNoEncontradoException {
-		Optional<Docente> docenteEncontrado = memoryDB.getListaDocentes().stream()
-				.filter(docente -> docente.getId() == id)
-				.findFirst();
-		if (docenteEncontrado.isPresent()) {
-			int indexOf = memoryDB.getListaDocentes().indexOf(docenteEncontrado.get());
-			memoryDB.getListaDocentes().remove(indexOf);
-		}
-		else {
-			throw new RecursoNoEncontradoException("Docente", id);
-		}
+		docenteRepo.deleteById(id);
 	}
-
 }

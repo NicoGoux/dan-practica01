@@ -8,66 +8,40 @@ import org.springframework.stereotype.Service;
 
 import isi.dan.practicas.practica1.exception.RecursoNoEncontradoException;
 import isi.dan.practicas.practica1.model.Alumno;
+import isi.dan.practicas.practica1.repositories.AlumnoRepository;
 import isi.dan.practicas.practica1.service.AlumnoService;
-import isi.dan.practicas.practica1.service.MemoryDB;
 
 @Service
 public class AlumnoServiceImpl implements AlumnoService {
 
 	@Autowired
-	private MemoryDB memoryDB;
+	AlumnoRepository alumnoRepo;
 
 	@Override
 	public Alumno guardarAlumno(Alumno a) throws RecursoNoEncontradoException {
-		if (a.getId() == null) {
-			a.setId(memoryDB.siguienteIdAlumno());
-			memoryDB.getListaAlumnos().add(a);
+		Alumno alumno = alumnoRepo.save(a);
+		if (alumno == null) {
+			throw new RecursoNoEncontradoException("Alumno", a.getId());
 		}
-		else {
-			Integer idAlumno = a.getId();
-			Optional<Alumno> alumnoEncontrado = memoryDB.getListaAlumnos().stream()
-					.filter(alumno -> alumno.getId() == idAlumno)
-					.findFirst();
-			if (alumnoEncontrado.isPresent()) {
-				int indexOf = memoryDB.getListaAlumnos().indexOf(alumnoEncontrado.get());
-				memoryDB.getListaAlumnos().set(indexOf, a);
-			}
-			else {
-				throw new RecursoNoEncontradoException("Alumno", idAlumno);
-			}
-		}
-		return a;
+		return alumno;
 	}
 
 	@Override
-	public Optional<Alumno> buscarAlumnoPorId(Integer id) throws RecursoNoEncontradoException {
-		Optional<Alumno> alumnoEncontrado = memoryDB.getListaAlumnos().stream()
-				.filter(alumno -> alumno.getId() == id)
-				.findFirst();
-		if (alumnoEncontrado.isPresent()) {
-			return alumnoEncontrado;
-		}
-		else {
+	public Alumno buscarAlumnoPorId(Integer id) throws RecursoNoEncontradoException {
+		Optional<Alumno> alumno = alumnoRepo.findById(id);
+		if (!alumno.isPresent()) {
 			throw new RecursoNoEncontradoException("Alumno", id);
 		}
+		return alumno.get();
 	}
 
 	@Override
 	public List<Alumno> listarAlumnos() {
-		return memoryDB.getListaAlumnos();
+		return alumnoRepo.findAll();
 	}
 
 	@Override
 	public void bajaAlumno(Integer id) throws RecursoNoEncontradoException {
-		Optional<Alumno> alumnoEncontrado = memoryDB.getListaAlumnos().stream()
-				.filter(alumno -> alumno.getId() == id)
-				.findFirst();
-		if (alumnoEncontrado.isPresent()) {
-			int indexOf = memoryDB.getListaAlumnos().indexOf(alumnoEncontrado.get());
-			memoryDB.getListaAlumnos().remove(indexOf);
-		}
-		else {
-			throw new RecursoNoEncontradoException("Alumno", id);
-		}
+		alumnoRepo.deleteById(id);
 	}
 }

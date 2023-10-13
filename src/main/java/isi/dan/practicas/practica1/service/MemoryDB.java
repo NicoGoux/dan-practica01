@@ -15,6 +15,7 @@ public class MemoryDB {
 	private List<Docente> listaDocentes;
 	private List<Alumno> listaAlumnos;
 	private List<Curso> listaCursos;
+
 	/**
 	 * @param idDocente
 	 * @param idAlumno
@@ -31,19 +32,21 @@ public class MemoryDB {
 		this.listaAlumnos = new ArrayList<>(0);
 		this.listaCursos = new ArrayList<>(0);
 	}
-	
+
 	/**
 	 * @return the listaDocentes
 	 */
 	public List<Docente> getListaDocentes() {
 		return listaDocentes;
 	}
+
 	/**
 	 * @return the listaAlumnos
 	 */
 	public List<Alumno> getListaAlumnos() {
 		return listaAlumnos;
 	}
+
 	/**
 	 * @return the listaCursos
 	 */

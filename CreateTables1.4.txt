@@ -1,0 +1,33 @@
+CREATE TABLE `alumno` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `nombre` varchar(50) NOT NULL,
+ `legajo` int NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `curso` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `nombre` varchar(50) NOT NULL,
+ `creditos` int NOT NULL,
+ `cupo` int NOT NULL,
+ `docente_asignado` int DEFAULT NULL,
+ PRIMARY KEY (`id`),
+ KEY `docente_asignado` (`docente_asignado`),
+ CONSTRAINT `docente_asignado` FOREIGN KEY (`docente_asignado`) REFERENCES `docente` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `curso_inscripto` (
+ `id_alumno` int NOT NULL,
+ `id_curso` int NOT NULL,
+ PRIMARY KEY (`id_alumno`,`id_curso`),
+ KEY `id_curso` (`id_curso`),
+ CONSTRAINT `id_alumno` FOREIGN KEY (`id_alumno`) REFERENCES `alumno` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
+ CONSTRAINT `id_curso` FOREIGN KEY (`id_curso`) REFERENCES `curso` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+
+CREATE TABLE `docente` (
+ `id` int NOT NULL AUTO_INCREMENT,
+ `nombre` varchar(50) NOT NULL,
+ `salario` double NOT NULL,
+ PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci

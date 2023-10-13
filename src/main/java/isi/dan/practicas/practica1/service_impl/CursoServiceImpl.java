@@ -12,16 +12,16 @@ import isi.dan.practicas.practica1.exception.RecursoNoEncontradoException;
 import isi.dan.practicas.practica1.model.Alumno;
 import isi.dan.practicas.practica1.model.Curso;
 import isi.dan.practicas.practica1.model.Docente;
+import isi.dan.practicas.practica1.repositories.CursoRepository;
 import isi.dan.practicas.practica1.service.AlumnoService;
 import isi.dan.practicas.practica1.service.CursoService;
 import isi.dan.practicas.practica1.service.DocenteService;
-import isi.dan.practicas.practica1.service.MemoryDB;
 
 @Service
 public class CursoServiceImpl implements CursoService {
 
 	@Autowired
-	private MemoryDB memoryDB;
+	CursoRepository cursoRepo;
 
 	@Autowired
 	AlumnoService alumnoService;
@@ -31,89 +31,79 @@ public class CursoServiceImpl implements CursoService {
 
 	@Override
 	public Curso guardarCurso(Curso c) throws RecursoNoEncontradoException {
-		if (c.getId() == null) {
-			c.setId(memoryDB.siguienteIdCurso());
-			memoryDB.getListaCursos().add(c);
+		Curso curso = cursoRepo.save(c);
+		if (curso == null) {
+			throw new RecursoNoEncontradoException("Curso", c.getId());
 		}
-		else {
-			Integer idCurso = c.getId();
-			Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
-					.filter(curso -> curso.getId() == idCurso)
-					.findFirst();
-			if (cursoEncontrado.isPresent()) {
-				int indexOf = memoryDB.getListaCursos().indexOf(cursoEncontrado.get());
-				memoryDB.getListaCursos().add(indexOf, c);
-			}
-			else {
-				throw new RecursoNoEncontradoException("Curso", idCurso);
-			}
-		}
-		return c;
+		return curso;
 	}
 
 	@Override
-	public Optional<Curso> buscarCursoPorId(Integer id) throws RecursoNoEncontradoException {
-		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
-				.filter(curso -> curso.getId() == id)
-				.findFirst();
-		if (cursoEncontrado.isPresent()) {
-			return cursoEncontrado;
-		}
-		else {
+	public Curso buscarCursoPorId(Integer id) throws RecursoNoEncontradoException {
+		Optional<Curso> curso = cursoRepo.findById(id);
+		if (!curso.isPresent()) {
 			throw new RecursoNoEncontradoException("Curso", id);
 		}
+		return curso.get();
 	}
 
 	@Override
 	public List<Curso> listarCursos() {
-		return memoryDB.getListaCursos();
+		return cursoRepo.findAll();
 	}
 
 	@Override
 	public void bajaCurso(Integer id) throws RecursoNoEncontradoException {
-		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
-				.filter(curso -> curso.getId() == id)
-				.findFirst();
-		if (cursoEncontrado.isPresent()) {
-			int indexOf = memoryDB.getListaCursos().indexOf(cursoEncontrado.get());
-			memoryDB.getListaCursos().remove(indexOf);
-		}
-		else {
-			throw new RecursoNoEncontradoException("Curso", id);
-		}
+		cursoRepo.deleteById(id);
 	}
 
 	@Override
 	public void asignarDocente(Integer idCurso, Integer idDocente)
 			throws RecursoNoEncontradoException, DocenteExcedidoException {
-		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
-				.filter(curso -> curso.getId() == idCurso)
-				.findFirst();
-		if (cursoEncontrado.isPresent()) {
-			Optional<Docente> docente = this.docenteService.buscarDocentePorId(idDocente);
-			if (docente.isPresent()) {
-				cursoEncontrado.get().asignarDocente(docente.get());
-			}
-		}
-		else {
+		Optional<Curso> cursoEncontrado = cursoRepo.findById(idCurso);
+		if (!cursoEncontrado.isPresent()) {
 			throw new RecursoNoEncontradoException("Curso", idCurso);
+		}
+
+		Docente docenteEncontrado = docenteService.buscarDocentePorId(idDocente);
+		if (docenteEncontrado != null) {
+			cursoEncontrado.get().asignarDocente(docenteEncontrado);
+			cursoRepo.save(cursoEncontrado.get());
 		}
 	}
 
 	@Override
 	public void inscribirAlumno(Integer idCurso, Integer idAlumno)
 			throws RecursoNoEncontradoException, CupoExcedidoException {
-		Optional<Curso> cursoEncontrado = memoryDB.getListaCursos().stream()
-				.filter(curso -> curso.getId() == idCurso)
-				.findFirst();
-		if (cursoEncontrado.isPresent()) {
-			Optional<Alumno> alumno = this.alumnoService.buscarAlumnoPorId(idAlumno);
-			if (alumno.isPresent()) {
-				cursoEncontrado.get().inscribirACurso(alumno.get());
-			}
-		}
-		else {
+		Optional<Curso> cursoEncontrado = cursoRepo.findById(idCurso);
+		if (!cursoEncontrado.isPresent()) {
 			throw new RecursoNoEncontradoException("Curso", idCurso);
+		}
+
+		Alumno alumnoEncontrado = alumnoService.buscarAlumnoPorId(idAlumno);
+		if (alumnoEncontrado != null) {
+			if (cursoEncontrado.get().getListaInscriptos().contains(alumnoEncontrado)) {
+				return;
+			}
+			cursoEncontrado.get().getListaInscriptos().add(alumnoEncontrado);
+			cursoRepo.save(cursoEncontrado.get());
+		}
+	}
+
+	@Override
+	public void desinscribirAlumno(Integer idCurso, Integer idAlumno) throws RecursoNoEncontradoException {
+		Optional<Curso> cursoEncontrado = cursoRepo.findById(idCurso);
+		if (!cursoEncontrado.isPresent()) {
+			throw new RecursoNoEncontradoException("Curso", idCurso);
+		}
+
+		Alumno alumnoEncontrado = alumnoService.buscarAlumnoPorId(idAlumno);
+		if (alumnoEncontrado != null) {
+			if (!(cursoEncontrado.get().getListaInscriptos().contains(alumnoEncontrado))) {
+				return;
+			}
+			cursoEncontrado.get().getListaInscriptos().remove(alumnoEncontrado);
+			cursoRepo.save(cursoEncontrado.get());
 		}
 	}
 }
