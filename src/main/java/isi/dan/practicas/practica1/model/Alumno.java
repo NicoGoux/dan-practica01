@@ -3,23 +3,37 @@ package isi.dan.practicas.practica1.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "alumno")
 public class Alumno {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @Column(name = "nombre", nullable = false)
     private String nombre;
+
+    @Column(name = "legajo", nullable = false)
     private Integer legajo;
-    List<Integer> cursosInscriptos;
+
+    @ManyToMany(mappedBy = "listaInscriptos")
+    private List<Curso> cursosInscriptos;
+
+    public Alumno() {
+        this.cursosInscriptos = new ArrayList<>();
+    }
 
     /**
-     * @param id
      * @param nombre
      * @param legajo
      * @param cursosInscriptos
      */
-    public Alumno(Integer id, String nombre, Integer legajo) {
-        this.id = id;
+    public Alumno(String nombre, Integer legajo) {
         this.nombre = nombre;
         this.legajo = legajo;
-        this.cursosInscriptos = new ArrayList<>(0);
+        this.cursosInscriptos = new ArrayList<>();
     }
 
     /**
@@ -71,19 +85,23 @@ public class Alumno {
      * @return the cursosInscriptos
      */
     public List<Integer> getCursosInscriptos() {
-        return cursosInscriptos;
+        List<Integer> cursosInscriptosId = new ArrayList<>();
+        for (Curso curso : cursosInscriptos) {
+            cursosInscriptosId.add(curso.getId());
+        }
+        return cursosInscriptosId;
     }
 
     /**
      * @param cursosInscriptos
      *            the cursosInscriptos to set
      */
-    public void setCursosInscriptos(List<Integer> cursosInscriptos) {
+    public void setCursosInscriptos(List<Curso> cursosInscriptos) {
         this.cursosInscriptos = cursosInscriptos;
     }
 
     public void addCursoInscripto(Curso curso) {
-        this.cursosInscriptos.add(curso.getId());
+        this.cursosInscriptos.add(curso);
     }
 
     @Override

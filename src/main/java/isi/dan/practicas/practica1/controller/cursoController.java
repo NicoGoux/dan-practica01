@@ -1,7 +1,5 @@
 package isi.dan.practicas.practica1.controller;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,14 +24,13 @@ public class cursoController {
 	CursoService cursoService;
 
 	@GetMapping()
-	public ResponseEntity<List<Curso>> listarCursos() {
+	public ResponseEntity<?> listarCursos() {
 		try {
 			return ResponseEntity.ok(this.cursoService.listarCursos());
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@GetMapping(path = "/{idCurso}/inscribir-alumno/{idAlumno}")
@@ -73,14 +70,13 @@ public class cursoController {
 	}
 
 	@GetMapping(path = "/{id}")
-	public ResponseEntity<Curso> obtenerCurso(@PathVariable Integer id) {
+	public ResponseEntity<?> obtenerCurso(@PathVariable Integer id) {
 		try {
 			return ResponseEntity.ok(this.cursoService.buscarCursoPorId(id));
 		}
 		catch (Exception e) {
-			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
 		}
-		return null;
 	}
 
 	@PostMapping

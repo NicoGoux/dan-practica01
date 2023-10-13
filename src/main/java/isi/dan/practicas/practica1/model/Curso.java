@@ -3,33 +3,52 @@ package isi.dan.practicas.practica1.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+
 import isi.dan.practicas.practica1.exception.CupoExcedidoException;
 import isi.dan.practicas.practica1.exception.DocenteExcedidoException;
 
+@Entity
+@Table(name = "curso")
 public class Curso {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
+
+	@Column(name = "nombre", nullable = false)
 	private String nombre;
+
+	@Column(name = "creditos", nullable = false)
 	private Integer creditos;
+
+	@Column(name = "cupo", nullable = false)
 	private Integer cupo;
+
+	@ManyToOne
+	@JoinColumn(name = "docente_id")
 	private Docente docenteAsignado;
-	private List<Integer> listaInscriptos;
+
+	@ManyToMany
+	@JoinTable(name = "alumno_curso", joinColumns = @JoinColumn(name = "curso_id"), inverseJoinColumns = @JoinColumn(name = "alumno_id"))
+	private List<Alumno> listaInscriptos;
+
+	public Curso() {
+		this.listaInscriptos = new ArrayList<>();
+	}
 
 	/**
-	 * @param id
 	 * @param nombre
 	 * @param creditos
 	 * @param cupo
 	 * @param docenteAsignado
 	 * @param listaInscriptos
 	 */
-	public Curso(Integer id, String nombre, Integer creditos, Integer cupo, Docente docenteAsignado,
-			List<Integer> listaInscriptos) {
-		this.id = id;
+	public Curso(String nombre, Integer creditos, Integer cupo, Docente docenteAsignado) {
 		this.nombre = nombre;
 		this.creditos = creditos;
 		this.cupo = cupo;
 		this.docenteAsignado = docenteAsignado;
-		this.listaInscriptos = listaInscriptos;
+		this.listaInscriptos = new ArrayList<>();
 	}
 
 	/**
@@ -110,7 +129,7 @@ public class Curso {
 	/**
 	 * @return the listaInscriptos
 	 */
-	public List<Integer> getListaInscriptos() {
+	public List<Alumno> getListaInscriptos() {
 		return listaInscriptos;
 	}
 
@@ -118,7 +137,7 @@ public class Curso {
 	 * @param listaInscriptos
 	 *            the listaInscriptos to set
 	 */
-	public void setListaInscriptos(List<Integer> listaInscriptos) {
+	public void setListaInscriptos(List<Alumno> listaInscriptos) {
 		this.listaInscriptos = listaInscriptos;
 	}
 
@@ -136,10 +155,10 @@ public class Curso {
 	}
 
 	public void inscribirACurso(Alumno alumno) throws CupoExcedidoException {
-		if (!this.listaInscriptos.contains(alumno.getId())) {
+		if (!this.listaInscriptos.contains(alumno)) {
 			if (this.listaInscriptos.size() < this.cupo) {
 				alumno.addCursoInscripto(this);
-				this.listaInscriptos.add(alumno.getId());
+				this.listaInscriptos.add(alumno);
 			}
 			else {
 				throw new CupoExcedidoException();

@@ -3,23 +3,38 @@ package isi.dan.practicas.practica1.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "docente")
 public class Docente {
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
+
+	@Column(name = "nombre", nullable = false)
 	private String nombre;
+
+	@Column(name = "salario", nullable = false)
 	private Double salario;
-	private List<Integer> cursosDictados;
+
+	@OneToMany(mappedBy = "docenteAsignado")
+	// @JsonIgnore
+	private List<Curso> cursosDictados;
+
+	public Docente() {
+		this.cursosDictados = new ArrayList<>();
+	}
 
 	/**
-	 * @param id
 	 * @param nombre
 	 * @param salario
 	 * @param cursosDictados
 	 */
-	public Docente(Integer id, String nombre, Double salario) {
-		this.id = id;
+	public Docente(String nombre, Double salario) {
 		this.nombre = nombre;
 		this.salario = salario;
-		this.cursosDictados = new ArrayList<>(0);
+		this.cursosDictados = new ArrayList<>();
 	}
 
 	/**
@@ -68,17 +83,22 @@ public class Docente {
 	}
 
 	/**
-	 * @return the cursosDictados
+	 * @return los ids de los cursos dictados, permitiendo que no se entre en un
+	 *         bucle al solicitar los objetos
 	 */
 	public List<Integer> getCursosDictados() {
-		return cursosDictados;
+		List<Integer> cursosDictadosId = new ArrayList<>();
+		for (Curso curso : cursosDictados) {
+			cursosDictadosId.add(curso.getId());
+		}
+		return cursosDictadosId;
 	}
 
 	/**
 	 * @param cursosDictados
 	 *            the cursosDictados to set
 	 */
-	public void setCursosDictados(List<Integer> cursosDictados) {
+	public void setCursosDictados(List<Curso> cursosDictados) {
 		this.cursosDictados = cursosDictados;
 	}
 
@@ -91,11 +111,11 @@ public class Docente {
 	}
 
 	public void removeCurso(Curso curso) {
-		this.cursosDictados.remove(this.cursosDictados.indexOf(curso.getId()));
+		this.cursosDictados.remove(this.cursosDictados.indexOf(curso));
 	}
 
 	public void addCursoDictado(Curso curso) {
-		this.cursosDictados.add(curso.getId());
+		this.cursosDictados.add(curso);
 	}
 
 	@Override
@@ -103,5 +123,4 @@ public class Docente {
 		return "Docente [id=" + id + ", nombre=" + nombre + ", salario=" + salario + ", cursosDictados="
 				+ cursosDictados + "]";
 	}
-
 }
